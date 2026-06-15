@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>HELKID 💜</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;}
+.app{max-width:390px;margin:0 auto;background:#f5f5f7;min-height:100vh;position:relative;}
+.header{background:white;border-bottom:0.5px solid #e5e5e5;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;}
+.header-title{font-size:17px;font-weight:600;color:#1a1a1a;}
+.tab-bar{display:flex;background:white;border-bottom:0.5px solid #e5e5e5;position:sticky;top:45px;z-index:19;}
+.tab{flex:1;padding:8px 1px 6px;text-align:center;font-size:9px;color:#aaa;cursor:pointer;border-bottom:2px solid transparent;}
+.tab.on{color:#9B6EB5;border-bottom-color:#9B6EB5;font-weight:600;}
+.tab-icon{font-size:17px;margin-bottom:2px;}
+.scr{display:none;padding:12px 12px 80px;}
+.scr.on{display:block;}
+.card{background:white;border-radius:14px;border:0.5px solid #e5e5e5;padding:14px;margin-bottom:10px;}
+.slbl{font-size:10px;font-weight:600;color:#aaa;margin:14px 0 8px;text-transform:uppercase;letter-spacing:.06em;}
+.ava{border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;}
+.add-btn{width:100%;padding:12px;border-radius:12px;background:#9B6EB5;color:white;border:none;font-size:14px;font-weight:600;cursor:pointer;margin-top:6px;}
+
+/* 피드 */
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;scrollbar-width:none;}
+.filter-row::-webkit-scrollbar{display:none;}
+.fchip{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:11px;border:1.5px solid #ddd;background:white;color:#666;cursor:pointer;font-weight:500;}
+.fchip.on{background:#9B6EB5;color:white;border-color:#9B6EB5;}
+.feed-card{background:white;border-radius:14px;border:0.5px solid #e5e5e5;padding:14px;margin-bottom:10px;}
+.feed-top{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.feed-name{font-size:13px;font-weight:600;color:#1a1a1a;}
+.feed-time{font-size:11px;color:#aaa;}
+.cat-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 9px;border-radius:10px;margin-bottom:8px;font-weight:500;}
+.feed-photo{width:100%;height:140px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:54px;margin-bottom:9px;}
+.feed-workout{font-size:13px;color:#555;line-height:1.6;margin-bottom:9px;}
+.feed-actions{display:flex;align-items:center;gap:14px;padding-top:8px;border-top:0.5px solid #f0f0f0;}
+.act-btn{display:flex;align-items:center;gap:4px;font-size:12px;color:#aaa;cursor:pointer;background:none;border:none;font-family:inherit;}
+.act-btn.liked{color:#E05580;}
+
+/* 캘린더 */
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cal-nav{background:none;border:0.5px solid #ddd;border-radius:6px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#666;font-size:16px;}
+.cal-wrap{background:white;border-radius:14px;border:0.5px solid #e5e5e5;padding:10px;margin-bottom:10px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;}
+.cal-lbl{text-align:center;font-size:9px;color:#bbb;padding:3px 0;font-weight:600;}
+.cal-cell{display:flex;flex-direction:column;align-items:center;padding:3px 1px 4px;cursor:pointer;border-radius:8px;min-height:46px;}
+.cal-cell:hover{background:#f8f8f8;}
+.cal-num{font-size:12px;color:#bbb;line-height:1;margin-bottom:3px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.cal-num.today{background:#9B6EB5;color:white;font-weight:600;}
+.cal-num.other{color:#e0e0e0;}
+.cal-num.active{color:#1a1a1a;font-weight:600;}
+.dots{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:32px;}
+.dot{width:6px;height:6px;border-radius:50%;}
+.legend{display:flex;flex-wrap:wrap;gap:5px 10px;margin-bottom:10px;}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#666;}
+.leg-dot{width:9px;height:9px;border-radius:50%;}
+.day-card{background:white;border-radius:14px;border:0.5px solid #e5e5e5;padding:12px;margin-bottom:8px;}
+.entry{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:0.5px solid #f5f5f5;cursor:pointer;}
+.entry:last-child{border-bottom:none;padding-bottom:0;}
+
+/* 멤버 */
+.mem-card{background:white;border-radius:14px;border:0.5px solid #e5e5e5;padding:14px;margin-bottom:10px;cursor:pointer;}
+.stat-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;}
+.stat-b{background:#f8f8f8;border-radius:10px;padding:8px 5px;text-align:center;}
+.stat-v{font-size:14px;font-weight:700;color:#1a1a1a;}
+.stat-l{font-size:9px;color:#bbb;margin-top:2px;}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.bar-bg{flex:1;height:7px;background:#f0f0f0;border-radius:8px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:8px;}
+.bar-lbl{font-size:11px;font-weight:600;white-space:nowrap;}
+.mini-bottles{display:flex;gap:3px;margin-top:4px;padding-left:22px;flex-wrap:wrap;}
+.mini-b{width:20px;height:28px;border-radius:3px 3px 5px 5px;border:1.5px solid #BDD9F0;background:#f0f8ff;position:relative;overflow:hidden;}
+.mini-b.filled{border-color:#3A8FD4;}
+.mini-b-fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,#7EC8E3,#3A8FD4);}
+
+/* 마이 */
+.my-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.my-stat-box{background:white;border-radius:12px;border:0.5px solid #e5e5e5;padding:11px 6px;text-align:center;}
+.my-stat-val{font-size:19px;font-weight:700;color:#1a1a1a;}
+.my-stat-lbl{font-size:9px;color:#aaa;margin-top:2px;}
+.water-card{background:white;border-radius:14px;border:0.5px solid #e5e5e5;padding:14px;margin-bottom:10px;}
+.w-controls{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.w-btn{width:42px;height:42px;border-radius:50%;border:2px solid #3A8FD4;background:white;color:#3A8FD4;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.bottle-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.bottle-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;}
+.bottle{width:42px;height:58px;border-radius:5px 5px 9px 9px;border:2px solid #BDD9F0;background:#f0f8ff;position:relative;overflow:hidden;}
+.bottle.filled{border-color:#3A8FD4;}
+.bottle-fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(180deg,#7EC8E3,#3A8FD4);}
+.bottle-neck{width:20px;height:7px;border:2px solid #BDD9F0;border-bottom:none;border-radius:4px 4px 0 0;}
+.bottle-ml{font-size:9px;color:#bbb;}
+.graph-tabs{display:flex;background:#f5f5f7;border-radius:10px;padding:3px;margin-bottom:12px;}
+.gtab{flex:1;padding:7px 4px;text-align:center;font-size:12px;color:#888;cursor:pointer;border-radius:8px;font-weight:500;}
+.gtab.on{background:white;color:#9B6EB5;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08);}
+.goal-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:0.5px solid #f5f5f5;}
+.goal-row:last-child{border-bottom:none;}
+.goal-key{font-size:12px;color:#888;}
+.goal-val{font-size:12px;font-weight:600;color:#1a1a1a;}
+.body-entry{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid #f5f5f5;cursor:pointer;}
+.body-entry:last-child{border-bottom:none;padding-bottom:0;}
+.body-thumb{width:44px;height:44px;border-radius:8px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;position:relative;overflow:hidden;}
+.thumb-lock{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.28);}
+
+/* 10계명 */
+.cmd-header{background:linear-gradient(135deg,#C8A8D8,#9B6EB5);border-radius:16px;padding:20px;margin-bottom:14px;text-align:center;}
+.cmd-item{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;border-bottom:0.5px solid #f5f5f5;}
+.cmd-item:last-child{border-bottom:none;}
+.cmd-item.hl{background:#FFF8E8;}
+.cmd-num{width:26px;height:26px;border-radius:50%;background:#EDD9F7;color:#9B6EB5;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.cmd-num.hl{background:#FFE082;color:#8B6500;}
+.cmd-rule{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px;}
+.cmd-desc{font-size:11px;color:#888;line-height:1.5;}
+
+/* 모달 공통 */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:100;}
+.modal-bg.open{display:flex;}
+.modal{background:white;border-radius:20px 20px 0 0;width:100%;max-width:390px;max-height:92vh;overflow-y:auto;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:15px 16px 12px;border-bottom:0.5px solid #f0f0f0;position:sticky;top:0;background:white;z-index:1;}
+.modal-ttl{font-size:16px;font-weight:600;color:#1a1a1a;}
+.mbody{padding:14px 16px 24px;}
+.flbl{font-size:11px;color:#888;font-weight:600;margin-bottom:6px;margin-top:12px;letter-spacing:.03em;}
+.flbl:first-child{margin-top:0;}
+.type-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.type-card{border:1.5px solid #ddd;border-radius:12px;padding:12px;text-align:center;cursor:pointer;}
+.type-card.sel{border-color:#9B6EB5;background:#F3EBF8;}
+.type-card-icon{font-size:22px;margin-bottom:4px;}
+.type-card span{font-size:12px;color:#888;display:block;}
+.type-card.sel span{color:#9B6EB5;font-weight:600;}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;}
+.cat-btn{border:1.5px solid #ddd;border-radius:20px;padding:8px 4px;text-align:center;cursor:pointer;font-size:11px;color:#888;font-weight:500;}
+.cat-btn.sel{border-color:#9B6EB5;background:#F3EBF8;color:#9B6EB5;font-weight:600;}
+.inp{width:100%;border:1px solid #e5e5e5;border-radius:10px;padding:10px 12px;font-size:13px;color:#1a1a1a;background:white;font-family:inherit;margin-bottom:10px;}
+.inp:focus{outline:none;border-color:#9B6EB5;}
+.cnt-wrap{position:relative;margin-bottom:12px;}
+textarea.inp{resize:none;line-height:1.6;padding-bottom:26px;margin-bottom:0;}
+.cnt{position:absolute;bottom:8px;right:10px;font-size:10px;color:#bbb;}
+.upload-zone{border:1.5px dashed #ddd;border-radius:12px;padding:18px;text-align:center;cursor:pointer;margin-bottom:12px;position:relative;}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.upload-prev{width:100%;height:130px;border-radius:10px;object-fit:cover;display:none;margin-bottom:12px;}
+.priv-row{display:flex;align-items:center;justify-content:space-between;border-radius:12px;padding:11px 13px;margin-bottom:12px;}
+.toggle{width:38px;height:22px;border-radius:11px;position:relative;cursor:pointer;flex-shrink:0;}
+.toggle.on{background:#9B6EB5;}
+.toggle.off{background:#ddd;}
+.toggle-thumb{width:18px;height:18px;border-radius:50%;background:white;position:absolute;top:2px;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .18s;}
+.toggle.on .toggle-thumb{left:18px;}
+.toggle.off .toggle-thumb{left:2px;}
+.lock-notice{display:flex;align-items:flex-start;gap:8px;background:#F3EBF8;border-radius:12px;padding:11px 13px;margin-bottom:12px;}
+.lock-notice p{font-size:11px;color:#7A4FA0;line-height:1.6;}
+.save-btn{width:100%;padding:13px;border-radius:12px;background:#9B6EB5;color:white;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+.det-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:100;}
+.det-bg.open{display:flex;}
+.det-modal{background:white;border-radius:20px 20px 0 0;width:100%;max-width:390px;}
+.det-photo{width:100%;height:160px;display:flex;align-items:center;justify-content:center;border-radius:20px 20px 0 0;font-size:56px;}
+.input-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.inp-box{display:flex;flex-direction:column;gap:4px;}
+.inp-lbl{font-size:11px;color:#888;font-weight:500;}
+.inp-row{display:flex;align-items:center;border:1px solid #e5e5e5;border-radius:10px;overflow:hidden;}
+.inp-row input{flex:1;border:none;padding:9px 10px;font-size:14px;font-weight:600;color:#1a1a1a;background:white;font-family:inherit;width:0;}
+.inp-row input:focus{outline:none;}
+.inp-row span{font-size:11px;color:#999;padding-right:10px;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <span style="font-size:20px;">💜</span>
+    <span class="header-title">HELKID</span>
+    <span style="font-size:12px;color:#aaa;font-weight:500;">6명</span>
+  </div>
+  <div class="tab-bar">
+    <div class="tab on"   onclick="sw('feed',this)"> <div class="tab-icon">📋</div>피드</div>
+    <div class="tab"      onclick="sw('cal',this)">  <div class="tab-icon">📅</div>캘린더</div>
+    <div class="tab"      onclick="sw('mem',this)">  <div class="tab-icon">👥</div>멤버</div>
+    <div class="tab"      onclick="sw('my',this)">   <div class="tab-icon">👤</div>마이</div>
+    <div class="tab"      onclick="sw('rules',this)"><div class="tab-icon">📜</div>10계명</div>
+  </div>
+
+  <!-- 피드 -->
+  <div id="s-feed" class="scr on">
+    <div class="filter-row">
+      <div class="fchip on" onclick="filterFeed('all',this)">전체</div>
+      <div class="fchip" onclick="filterFeed('hailey',this)" style="color:#A855C8;border-color:#A855C8;">헤일리</div>
+      <div class="fchip" onclick="filterFeed('jimin',this)"  style="color:#2DA882;border-color:#2DA882;">지민</div>
+      <div class="fchip" onclick="filterFeed('sora',this)"   style="color:#E05580;border-color:#E05580;">소라</div>
+      <div class="fchip" onclick="filterFeed('minho',this)"  style="color:#3A8FD4;border-color:#3A8FD4;">민호</div>
+      <div class="fchip" onclick="filterFeed('yuna',this)"   style="color:#D4820A;border-color:#D4820A;">유나</div>
+      <div class="fchip" onclick="filterFeed('junho',this)"  style="color:#4E9E38;border-color:#4E9E38;">준호</div>
+    </div>
+    <div id="feed-list"></div>
+    <button class="add-btn" onclick="openAdd('workout')">+ 운동 기록하기</button>
+  </div>
+
+  <!-- 캘린더 -->
+  <div id="s-cal" class="scr">
+    <div class="cal-hdr">
+      <button class="cal-nav" onclick="chMo(-1)">‹</button>
+      <span style="font-size:15px;font-weight:600;color:#1a1a1a;" id="mo-lbl"></span>
+      <button class="cal-nav" onclick="chMo(1)">›</button>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="cal-wrap"><div class="cal-grid" id="cal-grid"></div></div>
+    <p class="slbl" id="day-lbl">날짜를 눌러 기록을 확인하세요</p>
+    <div id="day-area"></div>
+    <button class="add-btn" onclick="openAdd('workout')">+ 운동 기록하기</button>
+  </div>
+
+  <!-- 멤버 -->
+  <div id="s-mem" class="scr">
+    <p class="slbl">우리 모임 멤버</p>
+    <div id="mem-list"></div>
+  </div>
+
+  <!-- 마이 -->
+  <div id="s-my" class="scr">
+    <div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div class="ava" style="width:52px;height:52px;font-size:20px;background:#EDD9F7;color:#7A4FA0;">H</div>
+      <div style="flex:1;">
+        <div style="font-size:16px;font-weight:700;color:#1a1a1a;">헤일리 👑</div>
+        <div style="font-size:12px;color:#aaa;margin-top:2px;">크로스핏 · 역도 · 조장</div>
+        <div style="display:flex;gap:5px;margin-top:6px;flex-wrap:wrap;">
+          <span style="font-size:10px;background:#EDD9F7;color:#7A4FA0;padding:2px 8px;border-radius:8px;font-weight:600;">10월 목표 54kg</span>
+          <span style="font-size:10px;background:#C8E8BF;color:#2E6E20;padding:2px 8px;border-radius:8px;font-weight:600;">주 4회</span>
+        </div>
+      </div>
+    </div>
+    <div class="my-stat-row">
+      <div class="my-stat-box"><div class="my-stat-val" style="color:#9B6EB5;">18</div><div class="my-stat-lbl">이번달 운동</div></div>
+      <div class="my-stat-box"><div class="my-stat-val">57.2</div><div class="my-stat-lbl">현재 체중(kg)</div></div>
+      <div class="my-stat-box"><div class="my-stat-val" style="color:#2DA882;">-3.2</div><div class="my-stat-lbl">목표까지(kg)</div></div>
+    </div>
+    <div class="card" style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:13px;font-weight:600;color:#1a1a1a;">🎯 이번달 운동 달성률</span>
+        <span style="font-size:22px;font-weight:700;color:#9B6EB5;">75%</span>
+      </div>
+      <div style="height:9px;background:#f0f0f0;border-radius:9px;overflow:hidden;margin-bottom:6px;">
+        <div style="height:100%;width:75%;background:linear-gradient(90deg,#C8A8D8,#9B6EB5);border-radius:9px;"></div>
+      </div>
+      <div style="font-size:11px;color:#aaa;">주 4회 목표 · 이번달 18회 / 목표 24회</div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+        <span style="font-size:11px;background:#F3EBF8;color:#9B6EB5;padding:3px 9px;border-radius:8px;">이번주 3회 완료</span>
+        <span style="font-size:11px;background:#E8F6F2;color:#1A7A5E;padding:3px 9px;border-radius:8px;">지난주 4회 ✓</span>
+        <span style="font-size:11px;background:#FEF4E8;color:#9C5E05;padding:3px 9px;border-radius:8px;">1회 더 하면 달성!</span>
+      </div>
+    </div>
+    <div class="water-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <div><div style="font-size:13px;font-weight:600;color:#1a1a1a;">💧 오늘 물 섭취</div><div style="font-size:11px;color:#aaa;margin-top:2px;" id="my-water-sub">목표까지 <b style="color:#3A8FD4;">500ml</b> 남았어!</div></div>
+        <div style="text-align:right;"><div style="font-size:20px;font-weight:700;color:#3A8FD4;" id="my-water-amt">1,500ml</div><div style="font-size:11px;color:#bbb;" id="my-water-goal-lbl">/ 2,000ml</div></div>
+      </div>
+      <div class="w-controls">
+        <button class="w-btn" onclick="addWater(-500)">−</button>
+        <div style="flex:1;text-align:center;"><div style="font-size:26px;font-weight:700;color:#1a1a1a;" id="my-water-big">1,500</div><div style="font-size:11px;color:#aaa;">ml 마셨어</div></div>
+        <button class="w-btn" onclick="addWater(500)">+</button>
+      </div>
+      <div class="bottle-row" id="my-bottle-row"></div>
+      <div style="height:7px;background:#f0f0f0;border-radius:7px;overflow:hidden;margin-bottom:5px;"><div style="height:100%;background:linear-gradient(90deg,#7EC8E3,#3A8FD4);border-radius:7px;transition:width .3s;" id="my-w-bar"></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:11px;color:#aaa;" id="my-w-pct">75% 달성</span>
+        <button onclick="openWaterGoal()" style="background:none;border:1px solid #ddd;color:#666;font-size:11px;padding:3px 9px;border-radius:8px;cursor:pointer;">목표 변경</button>
+      </div>
+    </div>
+    <p class="slbl">인바디 변화</p>
+    <div class="card">
+      <div class="graph-tabs">
+        <div class="gtab on" onclick="switchGraph('weight',this)">체중</div>
+        <div class="gtab" onclick="switchGraph('fat',this)">체지방률</div>
+        <div class="gtab" onclick="switchGraph('muscle',this)">골격근량</div>
+      </div>
+      <div style="position:relative;height:150px;margin-bottom:4px;"><canvas id="g-canvas" width="340" height="150"></canvas></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#bbb;margin-bottom:8px;padding:0 2px;" id="g-xlbl"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;gap:10px;" id="g-legend"></div>
+        <button onclick="openInbody()" style="background:none;border:1.5px solid #9B6EB5;color:#9B6EB5;font-size:11px;font-weight:600;padding:5px 11px;border-radius:10px;cursor:pointer;">+ 입력</button>
+      </div>
+    </div>
+    <p class="slbl">내 목표</p>
+    <div class="card">
+      <div class="goal-row"><span class="goal-key">📏 키</span><span class="goal-val">163 cm</span></div>
+      <div class="goal-row"><span class="goal-key">⚖️ 목표 체중</span><span class="goal-val">54.0 kg</span></div>
+      <div class="goal-row"><span class="goal-key">🔥 체지방률 목표</span><span class="goal-val">22% 이하</span></div>
+      <div class="goal-row"><span class="goal-key">💪 골격근량 목표</span><span class="goal-val">24.0 kg 이상</span></div>
+      <div class="goal-row"><span class="goal-key">📅 목표 기간</span><span class="goal-val">2025년 10월</span></div>
+      <div class="goal-row"><span class="goal-key">🏃 운동 목표</span><span class="goal-val">주 4회</span></div>
+      <div class="goal-row"><span class="goal-key">💧 물 목표</span><span class="goal-val">2,000ml / 일</span></div>
+      <div class="goal-row"><span class="goal-key">🥗 식단</span><span class="goal-val">단백질 위주, 저탄</span></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button class="add-btn" style="flex:1;margin-top:0;" onclick="openAdd('workout')">🏋️ 운동 기록</button>
+      <button style="flex:1;padding:12px;border-radius:12px;border:1.5px solid #9B6EB5;color:#9B6EB5;background:white;font-size:13px;font-weight:600;cursor:pointer;" onclick="openAdd('body')">🔒 눈바디</button>
+    </div>
+    <p class="slbl">내 눈바디 기록</p>
+    <div class="card">
+      <div class="body-entry" onclick="openBodyDet()">
+        <div class="body-thumb"><span style="filter:blur(3px);">🏃</span><div class="thumb-lock"><span style="color:white;font-size:13px;">🔒</span></div></div>
+        <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#1a1a1a;">6월 10일 눈바디</div><div style="font-size:11px;color:#aaa;margin-top:2px;">비공개 · 나만 보기</div></div>
+        <span style="color:#ddd;font-size:18px;">›</span>
+      </div>
+      <div class="body-entry" onclick="openBodyDet()">
+        <div class="body-thumb"><span style="filter:blur(3px);">💪</span><div class="thumb-lock"><span style="color:white;font-size:13px;">🔒</span></div></div>
+        <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#1a1a1a;">6월 1일 눈바디</div><div style="font-size:11px;color:#aaa;margin-top:2px;">비공개 · 나만 보기</div></div>
+        <span style="color:#ddd;font-size:18px;">›</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10계명 -->
+  <div id="s-rules" class="scr">
+    <div class="cmd-header">
+      <div style="font-size:18px;font-weight:700;color:white;margin-bottom:3px;">🏆 우리 모임 10계명</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.85);">HELKID 6인의 약속</div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;" id="cmd-list"></div>
+    <div style="text-align:center;padding:12px 0 4px;">
+      <button onclick="alert('실제 앱에서는 조장(헤일리)만 수정 가능해요! ✏️')" style="background:none;border:1.5px solid #9B6EB5;color:#9B6EB5;padding:9px 24px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;">✏️ 계명 수정하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 기록 모달 -->
+<div class="modal-bg" id="add-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <span class="modal-ttl" id="add-ttl">운동 기록하기</span>
+      <button style="background:none;border:none;cursor:pointer;font-size:22px;color:#bbb;" onclick="closeAdd()">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="type-row">
+        <div class="type-card sel" id="tc-w" onclick="selType('workout')"><div class="type-card-icon">🏋️</div><span>운동 기록</span></div>
+        <div class="type-card"     id="tc-b" onclick="selType('body')">  <div class="type-card-icon">🔒</div><span>눈바디 기록</span></div>
+      </div>
+      <div id="f-workout">
+        <div class="flbl">운동 종류</div>
+        <div class="cat-grid">
+          <div class="cat-btn" id="cat-weight"   onclick="selCat('weight')">🏋️ 헬스·웨이트</div>
+          <div class="cat-btn" id="cat-pilates"  onclick="selCat('pilates')">🧘 필라테스</div>
+          <div class="cat-btn" id="cat-running"  onclick="selCat('running')">🏃 러닝</div>
+          <div class="cat-btn" id="cat-home"     onclick="selCat('home')">🏠 홈트레이닝</div>
+          <div class="cat-btn" id="cat-crossfit" onclick="selCat('crossfit')">⚡ 크로스핏</div>
+          <div class="cat-btn" id="cat-etc"      onclick="selCat('etc')">✏️ 기타</div>
+        </div>
+        <div id="other-wrap" style="display:none;margin-bottom:12px;"><input class="inp" type="text" placeholder="운동 종류를 직접 입력해줘" style="margin-bottom:0;"></div>
+        <div class="flbl">오늘의 운동</div>
+        <div class="cnt-wrap"><textarea class="inp" id="workout-detail" rows="4" placeholder="오늘 한 운동 써줘!&#10;예) 백스쿼트 3x5 @ 57kg, 데드리프트 70kg 3세트" oninput="upCnt(this,'dc',200)"></textarea><span class="cnt" id="dc">0/200</span></div>
+        <div class="flbl">사진</div>
+        <div class="upload-zone" id="wz"><input type="file" accept="image/*" onchange="prevImg(this,'wp','wz')"><div style="font-size:26px;margin-bottom:5px;">📷</div><span style="font-size:12px;color:#aaa;">사진 찍거나 갤러리에서 선택</span></div>
+        <img id="wp" class="upload-prev">
+        <div class="priv-row" style="background:#f8f8f8;">
+          <div style="display:flex;align-items:center;gap:9px;"><span id="w-icon" style="font-size:18px;">🌍</span><div><div style="font-size:12px;font-weight:600;color:#1a1a1a;" id="w-ptxt">공개</div><div style="font-size:10px;color:#aaa;" id="w-psub">멤버 모두에게 공개</div></div></div>
+          <div class="toggle on" id="wt" onclick="togW()"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+      <div id="f-body" style="display:none;">
+        <div class="lock-notice"><span style="font-size:16px;flex-shrink:0;">🔒</span><p>눈바디는 기본으로 <strong>비공개</strong>예요.<br>직접 토글을 켜야만 멤버에게 공개돼요.</p></div>
+        <div class="upload-zone" id="bz"><input type="file" accept="image/*" onchange="prevImg(this,'bp','bz')"><div style="font-size:26px;margin-bottom:5px;">📷</div><span style="font-size:12px;color:#aaa;">눈바디 사진 찍거나 선택</span></div>
+        <img id="bp" class="upload-prev">
+        <div class="flbl">오늘의 한마디 (선택)</div>
+        <div class="cnt-wrap"><textarea class="inp" id="body-memo" rows="2" placeholder="예) 허리 라인이 생기기 시작했어 👀" oninput="upCnt(this,'bc',60)"></textarea><span class="cnt" id="bc">0/60</span></div>
+        <div class="priv-row" style="background:#F3EBF8;border:1px solid #D4A8E8;">
+          <div style="display:flex;align-items:center;gap:9px;"><span id="b-icon" style="font-size:18px;">🔒</span><div><div style="font-size:12px;font-weight:600;color:#1a1a1a;" id="b-ptxt">비공개</div><div style="font-size:10px;color:#aaa;" id="b-psub">나만 볼 수 있어요</div></div></div>
+          <div class="toggle off" id="bt" onclick="togB()"><div class="toggle-thumb"></div></div>
+        </div>
+      </div>
+      <button class="save-btn" onclick="save()">올리기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 인바디 입력 모달 -->
+<div class="modal-bg" id="inbody-modal">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-ttl">📊 인바디 입력</span><button style="background:none;border:none;cursor:pointer;font-size:22px;color:#bbb;" onclick="closeInbody()">✕</button></div>
+    <div class="mbody">
+      <div class="flbl">측정 날짜</div><input type="date" class="inp" id="inbody-date">
+      <div class="flbl">측정값</div>
+      <div class="input-grid">
+        <div class="inp-box"><div class="inp-lbl">⚖️ 체중</div><div class="inp-row"><input type="number" id="inp-w" placeholder="57.2" step="0.1"><span>kg</span></div></div>
+        <div class="inp-box"><div class="inp-lbl">🔥 체지방률</div><div class="inp-row"><input type="number" id="inp-f" placeholder="28.5" step="0.1"><span>%</span></div></div>
+        <div class="inp-box"><div class="inp-lbl">💪 골격근량</div><div class="inp-row"><input type="number" id="inp-m" placeholder="21.3" step="0.1"><span>kg</span></div></div>
+        <div class="inp-box"><div class="inp-lbl">💦 체수분</div><div class="inp-row"><input type="number" id="inp-wt" placeholder="31.2" step="0.1"><span>kg</span></div></div>
+        <div class="inp-box"><div class="inp-lbl">📊 BMI</div><div class="inp-row"><input type="number" id="inp-bmi" placeholder="21.5" step="0.1"><span></span></div></div>
+        <div class="inp-box"><div class="inp-lbl">⚡ 기초대사량</div><div class="inp-row"><input type="number" id="inp-bmr" placeholder="1240"><span>kcal</span></div></div>
+      </div>
+      <button class="save-btn" onclick="saveInbody()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 물 목표 모달 -->
+<div class="modal-bg" id="water-modal">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-ttl">💧 물 목표 설정</span><button style="background:none;border:none;cursor:pointer;font-size:22px;color:#bbb;" onclick="closeWater()">✕</button></div>
+    <div class="mbody"><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;" id="water-opts"></div><button class="save-btn" onclick="closeWater()">확인</button></div>
+  </div>
+</div>
+
+<!-- 운동 상세 -->
+<div class="det-bg" id="det-bg">
+  <div class="det-modal">
+    <div class="det-photo" id="det-photo"></div>
+    <div style="padding:14px 16px 24px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div class="ava" id="det-ava" style="width:34px;height:34px;font-size:13px;"></div>
+        <div style="flex:1;"><div style="font-size:15px;font-weight:600;color:#1a1a1a;" id="det-ttl"></div><div style="font-size:11px;color:#aaa;" id="det-date"></div></div>
+        <button style="background:none;border:none;cursor:pointer;font-size:22px;color:#bbb;" onclick="closeDet()">✕</button>
+      </div>
+      <div style="font-size:13px;color:#555;line-height:1.65;" id="det-desc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 눈바디 상세 -->
+<div class="det-bg" id="body-bg">
+  <div class="det-modal">
+    <div id="body-photo-wrap"></div>
+    <div style="padding:14px 16px 24px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div class="ava" style="width:34px;height:34px;font-size:13px;background:#EDD9F7;color:#7A4FA0;">H</div>
+        <div style="flex:1;"><div style="font-size:15px;font-weight:600;color:#1a1a1a;">6월 10일 눈바디</div><div style="font-size:11px;color:#aaa;">비공개 · 나만 보기</div></div>
+        <button style="background:none;border:none;cursor:pointer;font-size:22px;color:#bbb;" onclick="closeBodyDet()">✕</button>
+      </div>
+      <div id="body-unlock-area"></div>
+      <div style="font-size:13px;color:#555;line-height:1.65;">허리 라인이 조금 잡히는 것 같아 뿌듯! 계속 유지하자 💪</div>
+    </div>
+  </div>
+</div>
+
+<!-- 멤버 상세 -->
+<div class="det-bg" id="mem-det-bg">
+  <div class="det-modal" style="max-height:88vh;overflow-y:auto;border-radius:20px 20px 0 0;">
+    <div style="padding:16px 16px 24px;" id="mem-det-body"></div>
+  </div>
+</div>
+
+<script>
+const M={
+  hailey:{name:'헤일리',ini:'H',bg:'#EDD9F7',tc:'#7A4FA0',color:'#A855C8',sub:'크로스핏 · 역도',badge:'👑',height:163,weight:57.2,goalWeight:54,weightPrivate:false,freq:'주 4회',goalFreq:4,done:18,goalDone:24,waterMl:1500,waterGoal:2000,fat:28.5,muscle:21.6,diet:'단백질 위주, 저탄',goalDate:'2025년 10월'},
+  jimin: {name:'지민', ini:'J', bg:'#C8EDE2',tc:'#1A7A5E',color:'#2DA882',sub:'러닝 · 유산소',         height:168,weight:62.1,goalWeight:58,weightPrivate:false,freq:'주 5회',goalFreq:5,done:20,goalDone:20,waterMl:2000,waterGoal:2000,fat:25.3,muscle:23.1,diet:'저칼로리',goalDate:'2025년 9월'},
+  sora:  {name:'소라', ini:'S', bg:'#F9D0DC',tc:'#A83058',color:'#E05580',sub:'필라테스 · 요가',       height:160,weight:55.3,goalWeight:52,weightPrivate:true, freq:'주 3회',goalFreq:3,done:10,goalDone:12,waterMl:1000,waterGoal:1500,fat:30.1,muscle:19.2,diet:'균형식',goalDate:'2025년 8월'},
+  minho: {name:'민호', ini:'M', bg:'#C8DFF5',tc:'#1E5E99',color:'#3A8FD4',sub:'헬스 · 웨이트',        height:178,weight:80.5,goalWeight:75,weightPrivate:false,freq:'주 4회',goalFreq:4,done:17,goalDone:16,waterMl:2500,waterGoal:3000,fat:22.4,muscle:35.2,diet:'고단백',goalDate:'2025년 12월'},
+  yuna:  {name:'유나', ini:'Y', bg:'#F9DFB0',tc:'#9C5E05',color:'#D4820A',sub:'수영 · 유산소',        height:165,weight:58.9,goalWeight:55,weightPrivate:true, freq:'주 3회',goalFreq:3,done:9, goalDone:12,waterMl:1500,waterGoal:2000,fat:27.8,muscle:20.5,diet:'저나트륨',goalDate:'2025년 11월'},
+  junho: {name:'준호', ini:'J2',bg:'#C8E8BF',tc:'#2E6E20',color:'#4E9E38',sub:'헬스 · 웨이트',       height:182,weight:85.2,goalWeight:80,weightPrivate:false,freq:'주 5회',goalFreq:5,done:21,goalDone:20,waterMl:3000,waterGoal:3000,fat:19.8,muscle:38.4,diet:'고단백, 탄수화물 조절',goalDate:'2025년 10월'},
+};
+const FEEDS=[
+  {id:1,member:'hailey',cat:'크로스핏',time:'오늘 오전 7:23',workout:'백스쿼트 3x5 @ 57kg PR 달성! 이후 메트콘 21-15-9 버피+케틀벨스윙 🎉',emoji:'🏋️',likes:4},
+  {id:2,member:'jimin', cat:'러닝',    time:'어제 오후 6:45',workout:'한강 러닝 5km 26분 완주! 페이스 5:12/km 신기록 🏃',emoji:'🌅',likes:5},
+  {id:3,member:'sora',  cat:'필라테스',time:'6월 12일',       workout:'리포머 필라테스 50분. 코어 집중 루틴. 허리가 훨씬 가벼워진 느낌! ✨',emoji:'🧘',likes:3},
+  {id:4,member:'minho', cat:'헬스·웨이트',time:'6월 11일',   workout:'벤치프레스 85kg 도전! 3세트 중 2세트 성공 💪',emoji:'💪',likes:6},
+  {id:5,member:'yuna',  cat:'수영',    time:'6월 10일',       workout:'자유형+배영 혼합 1.2km 완주. 처음으로 쉬지 않고 1km 넘겼어 🏊',emoji:'🏊',likes:4},
+  {id:6,member:'junho', cat:'헬스·웨이트',time:'6월 9일',    workout:'데드리프트 110kg 신기록!!! 🔥🔥🔥',emoji:'🔥',likes:7},
+];
+const WD={
+  '2026-6-2': [{member:'hailey',name:'Back Squat',desc:'백스쿼트 3x5 @ 55kg!',emoji:'🏋️'},{member:'minho',name:'벤치프레스',desc:'벤치 80kg 3세트',emoji:'💪'}],
+  '2026-6-3': [{member:'sora',name:'필라테스',desc:'리포머 50분',emoji:'🧘'},{member:'yuna',name:'수영',desc:'자유형 1km',emoji:'🏊'}],
+  '2026-6-5': [{member:'hailey',name:'Clean & Jerk',desc:'인상 40kg',emoji:'🏋️'},{member:'sora',name:'요가',desc:'저녁 요가 1시간',emoji:'🧘'},{member:'minho',name:'스쿼트',desc:'프론트스쿼트 70kg',emoji:'💪'}],
+  '2026-6-9': [{member:'hailey',name:'Metcon',desc:'21-15-9 버피+케틀벨',emoji:'🔥'},{member:'junho',name:'어깨',desc:'숄더프레스',emoji:'💪'}],
+  '2026-6-10':[{member:'jimin',name:'러닝 8km',desc:'비 맞으면서 달렸다 ㅋㅋ',emoji:'🌧️'},{member:'sora',name:'필라테스',desc:'매트 45분',emoji:'🧘'},{member:'yuna',name:'수영',desc:'평영 800m',emoji:'🏊'}],
+  '2026-6-12':[{member:'jimin',name:'러닝 5km',desc:'26분 신기록!',emoji:'🏃'},{member:'hailey',name:'스내치',desc:'35kg 연습',emoji:'🏋️'},{member:'sora',name:'코어',desc:'플랭크 5분!',emoji:'🔥'}],
+  '2026-6-13':[{member:'hailey',name:'Back Squat+Metcon',desc:'57kg PR! 메트콘 21-15-9',emoji:'🏋️'},{member:'yuna',name:'수영 1.2km',desc:'자유형+배영',emoji:'🏊'},{member:'junho',name:'데드리프트 PR',desc:'110kg 신기록! 🎉',emoji:'🔥'}],
+};
+const RULES=[
+  {e:'🏃',r:'주 목표 운동 횟수를 반드시 지킨다',d:'각자 정한 횟수는 무슨 일이 있어도 채우기!'},
+  {e:'📸',r:'운동 후 반드시 기록을 올린다',d:'사진 없어도 OK, 텍스트라도 올리기'},
+  {e:'💬',r:'서로의 기록에 반응해준다',d:'좋아요나 댓글로 응원 한마디씩!'},
+  {e:'🚫',r:'액상과당·튀김 금지',d:'내 몸은 내가 지킨다! 액상과당이랑 튀김은 우리 모임에서 퇴출 🙅',hl:true},
+  {e:'⚖️',r:'몸 변화를 꾸준히 기록한다',d:'체중/인바디 변화를 기록하고 공유하기'},
+  {e:'🙅',r:'서로 비교하거나 비난하지 않는다',d:'각자의 페이스를 존중! 응원만 OK'},
+  {e:'🎯',r:'목표를 중간에 바꿀 수 있다',d:'현실적인 목표 수정 환영, 포기만 NO'},
+  {e:'🔒',r:'눈바디·체중 공개 여부는 본인이 결정한다',d:'강요 절대 금지! 프라이버시 존중'},
+  {e:'🤝',r:'한 달에 한 번 오프라인 운동을 함께 한다',d:'같이 운동하면 더 신나잖아 💪'},
+  {e:'🏆',r:'목표 달성 시 다 같이 축하한다',d:'달성자는 맛있는 거 한 턴! (건강하게 ㅋㅋ)'},
+];
+let inbodyData=[
+  {date:'1월',weight:60.0,fat:31.2,muscle:20.1},{date:'2월',weight:59.3,fat:30.5,muscle:20.4},
+  {date:'3월',weight:58.7,fat:29.8,muscle:20.8},{date:'4월',weight:58.1,fat:29.1,muscle:21.0},
+  {date:'5월',weight:57.8,fat:28.8,muscle:21.3},{date:'6월',weight:57.2,fat:28.5,muscle:21.6},
+];
+const GG={weight:54,fat:22,muscle:24};
+const GC={weight:'#9B6EB5',fat:'#E05580',muscle:'#2DA882'};
+const GL={weight:'체중(kg)',fat:'체지방률(%)',muscle:'골격근량(kg)'};
+let curGraph='weight',yr=2026,mo=5,wPub=true,bPub=false,curCat=null,waterMl=1500,waterGoal=2000;
+const likes={};
+
+function sw(id,el){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('s-'+id).classList.add('on');el.classList.add('on');
+  if(id==='cal'){renderCal();showDay('2026-6-13',13);}
+  if(id==='mem')renderMembers();
+  if(id==='rules')renderRules();
+  if(id==='my'){renderWater();drawGraph();}
+}
+function renderFeed(filter){
+  const list=document.getElementById('feed-list');list.innerHTML='';
+  FEEDS.filter(f=>filter==='all'||f.member===filter).forEach(f=>{
+    const m=M[f.member];const div=document.createElement('div');div.className='feed-card';
+    div.innerHTML=`<div class="feed-top"><div class="ava" style="width:38px;height:38px;font-size:14px;background:${m.bg};color:${m.tc};">${m.ini}</div><div style="flex:1;"><div class="feed-name">${m.name}${m.badge?' '+m.badge:''}</div><div class="feed-time">${f.time}</div></div><div style="width:10px;height:10px;border-radius:50%;background:${m.color};"></div></div><div class="cat-badge" style="background:${m.bg};color:${m.tc};">${f.cat}</div><div class="feed-photo" style="background:${m.bg};">${f.emoji}</div><div class="feed-workout">${f.workout}</div><div class="feed-actions"><button class="act-btn${likes[f.id]?' liked':''}" id="like-${f.id}" onclick="togLike(${f.id},event)">♥ <span id="lc-${f.id}">${f.likes+(likes[f.id]?1:0)}</span></button><button class="act-btn">💬 댓글</button></div>`;
+    list.appendChild(div);
+  });
+}
+function togLike(id,e){e.stopPropagation();likes[id]=!likes[id];const f=FEEDS.find(x=>x.id===id);document.getElementById('like-'+id).className='act-btn'+(likes[id]?' liked':'');document.getElementById('lc-'+id).textContent=f.likes+(likes[id]?1:0);}
+function filterFeed(m,el){document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));el.classList.add('on');renderFeed(m);}
+function chMo(d){mo+=d;if(mo>11){mo=0;yr++;}if(mo<0){mo=11;yr--;}renderCal();document.getElementById('day-area').innerHTML='';document.getElementById('day-lbl').textContent='날짜를 눌러 기록을 확인하세요';}
+function renderCal(){
+  const mns=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('mo-lbl').textContent=yr+'년 '+mns[mo];
+  const lg=document.getElementById('legend');lg.innerHTML='';
+  Object.values(M).forEach(m=>{const d=document.createElement('div');d.className='leg-item';d.innerHTML=`<div class="leg-dot" style="background:${m.color}"></div>${m.name}`;lg.appendChild(d);});
+  const g=document.getElementById('cal-grid');g.innerHTML='';
+  ['일','월','화','수','목','금','토'].forEach(d=>{const e=document.createElement('div');e.className='cal-lbl';e.textContent=d;g.appendChild(e);});
+  const fd=new Date(yr,mo,1).getDay(),dim=new Date(yr,mo+1,0).getDate(),td=new Date();
+  for(let i=0;i<fd;i++){const c=document.createElement('div');c.className='cal-cell';const n=document.createElement('div');n.className='cal-num other';n.textContent=new Date(yr,mo,0-(fd-i-2)).getDate();c.appendChild(n);g.appendChild(c);}
+  for(let d=1;d<=dim;d++){
+    const key=yr+'-'+(mo+1)+'-'+d;const c=document.createElement('div');c.className='cal-cell';
+    const n=document.createElement('div');const isT=td.getFullYear()===yr&&td.getMonth()===mo&&td.getDate()===d;
+    n.className='cal-num'+(isT?' today':'')+(WD[key]?' active':'');n.textContent=d;c.appendChild(n);
+    if(WD[key]){const ds=document.createElement('div');ds.className='dots';WD[key].forEach(w=>{const dot=document.createElement('div');dot.className='dot';dot.style.background=M[w.member].color;ds.appendChild(dot);});c.appendChild(ds);}
+    c.onclick=()=>showDay(key,d);g.appendChild(c);
+  }
+}
+function showDay(key,d){
+  const mns=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('day-lbl').textContent=yr+'년 '+mns[mo]+' '+d+'일 기록';
+  const area=document.getElementById('day-area');
+  if(!WD[key]){area.innerHTML='<div style="text-align:center;padding:18px;color:#bbb;font-size:13px;">이 날은 운동 기록이 없어요 😴</div>';return;}
+  const box=document.createElement('div');box.className='day-card';
+  box.innerHTML='<div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:8px;">'+WD[key].length+'명 운동함</div>';
+  WD[key].forEach(w=>{
+    const m=M[w.member];const e=document.createElement('div');e.className='entry';
+    e.innerHTML=`<div class="ava" style="width:30px;height:30px;font-size:12px;background:${m.bg};color:${m.tc};">${m.ini}</div><div style="flex:1;"><div style="font-size:10px;color:#aaa;">${m.name}</div><div style="font-size:13px;font-weight:600;color:#1a1a1a;">${w.name}</div></div><span style="color:#ddd;font-size:16px;">›</span>`;
+    e.onclick=()=>openDet(w,m,yr+'년 '+mns[mo]+' '+d+'일');box.appendChild(e);
+  });
+  area.innerHTML='';area.appendChild(box);
+}
+function renderMembers(){
+  const list=document.getElementById('mem-list');list.innerHTML='';
+  Object.values(M).forEach(m=>{
+    const ap=Math.min(100,Math.round(m.done/m.goalDone*100));
+    const wp=Math.min(100,Math.round(m.waterMl/m.waterGoal*100));
+    const bottles=Math.round(m.waterGoal/500);const filled=Math.floor(m.waterMl/500);
+    let bHtml='';for(let i=0;i<bottles;i++){const f=i<filled;bHtml+=`<div class="mini-b${f?' filled':''}"><div class="mini-b-fill" style="height:${f?'100%':'0%'}"></div></div>`;}
+    const wDisplay=m.weightPrivate?'<span style="color:#bbb;font-size:13px;">🔒 비공개</span>':`<div style="font-size:18px;font-weight:700;color:${m.tc};">${m.weight}kg</div><div style="font-size:10px;color:#bbb;">현재 체중</div>`;
+    const card=document.createElement('div');card.className='mem-card';
+    card.innerHTML=`<div style="display:flex;align-items:center;gap:11px;margin-bottom:12px;"><div class="ava" style="width:44px;height:44px;font-size:17px;background:${m.bg};color:${m.tc};">${m.ini}</div><div style="flex:1;"><div style="font-size:14px;font-weight:600;color:#1a1a1a;">${m.name}${m.badge?' '+m.badge:''}</div><div style="font-size:11px;color:#aaa;margin-top:2px;">${m.sub}</div><div style="display:flex;gap:5px;margin-top:5px;flex-wrap:wrap;"><span style="font-size:10px;padding:2px 8px;border-radius:8px;background:${m.bg};color:${m.tc};font-weight:600;">${m.freq}</span><span style="font-size:10px;padding:2px 8px;border-radius:8px;background:#f5f5f5;color:#666;">📏 ${m.height}cm</span></div></div><div style="text-align:right;">${wDisplay}</div></div><div class="stat-row3"><div class="stat-b"><div class="stat-v" style="color:${m.color};">${m.done}회</div><div class="stat-l">이번달</div></div><div class="stat-b"><div class="stat-v" style="color:${ap>=100?'#2DA882':'#1a1a1a'};">${ap}%</div><div class="stat-l">달성률</div></div><div class="stat-b"><div class="stat-v" style="color:#3A8FD4;">${(m.waterMl/1000).toFixed(1)}L</div><div class="stat-l">오늘 물</div></div></div><div class="bar-row" style="margin-bottom:6px;"><span style="font-size:13px;">🏃</span><div class="bar-bg"><div class="bar-fill" style="width:${ap}%;background:linear-gradient(90deg,${m.color}88,${m.color});"></div></div><span class="bar-lbl" style="color:${m.color};">${m.done}/${m.goalDone}회</span></div><div class="bar-row"><span style="font-size:13px;">💧</span><div class="bar-bg"><div class="bar-fill" style="width:${wp}%;background:linear-gradient(90deg,#7EC8E3,#3A8FD4);"></div></div><span class="bar-lbl" style="color:#3A8FD4;">${m.waterMl.toLocaleString()}/${m.waterGoal.toLocaleString()}ml</span></div><div class="mini-bottles">${bHtml}</div>`;
+    card.onclick=()=>openMemDet(m);list.appendChild(card);
+  });
+}
+function openMemDet(m){
+  const ap=Math.min(100,Math.round(m.done/m.goalDone*100));
+  const wp=Math.min(100,Math.round(m.waterMl/m.waterGoal*100));
+  const wLine=m.weightPrivate?'<div class="goal-row"><span class="goal-key">⚖️ 체중</span><span class="goal-val" style="color:#bbb;">🔒 비공개</span></div>':`<div class="goal-row"><span class="goal-key">⚖️ 현재 체중</span><span class="goal-val">${m.weight} kg</span></div><div class="goal-row"><span class="goal-key">🎯 목표 체중</span><span class="goal-val">${m.goalWeight} kg</span></div>`;
+  document.getElementById('mem-det-body').innerHTML=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><div class="ava" style="width:50px;height:50px;font-size:19px;background:${m.bg};color:${m.tc};">${m.ini}</div><div><div style="font-size:17px;font-weight:700;color:#1a1a1a;">${m.name}${m.badge?' '+m.badge:''}</div><div style="font-size:12px;color:#aaa;margin-top:3px;">${m.sub}</div></div><button style="margin-left:auto;background:none;border:none;cursor:pointer;font-size:22px;color:#bbb;" onclick="closeMemDet()">✕</button></div><div style="background:#f8f8f8;border-radius:12px;padding:12px;margin-bottom:10px;"><div style="font-size:10px;font-weight:600;color:#aaa;margin-bottom:8px;">이번달 운동</div><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><div style="font-size:26px;font-weight:700;color:${m.color};">${ap}%</div><div><div style="font-size:13px;font-weight:600;">${m.done}회 / 목표 ${m.goalDone}회</div><div style="font-size:11px;color:#aaa;">${m.freq} 기준</div></div></div><div style="height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;"><div style="height:100%;width:${ap}%;background:linear-gradient(90deg,${m.color}88,${m.color});border-radius:8px;"></div></div></div><div style="background:#f8f8f8;border-radius:12px;padding:12px;margin-bottom:10px;"><div style="font-size:10px;font-weight:600;color:#aaa;margin-bottom:8px;">오늘 물 섭취</div><div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;"><div style="font-size:26px;font-weight:700;color:#3A8FD4;">${wp}%</div><div><div style="font-size:13px;font-weight:600;">${m.waterMl.toLocaleString()}ml / ${m.waterGoal.toLocaleString()}ml</div><div style="font-size:11px;color:#aaa;">500ml 기준 ${Math.floor(m.waterMl/500)}/${Math.round(m.waterGoal/500)}병</div></div></div><div style="height:8px;background:#f0f0f0;border-radius:8px;overflow:hidden;"><div style="height:100%;width:${wp}%;background:linear-gradient(90deg,#7EC8E3,#3A8FD4);border-radius:8px;"></div></div></div><div style="background:#f8f8f8;border-radius:12px;padding:12px;"><div style="font-size:10px;font-weight:600;color:#aaa;margin-bottom:4px;">목표 & 정보</div><div class="goal-row"><span class="goal-key">📏 키</span><span class="goal-val">${m.height} cm</span></div>${wLine}<div class="goal-row"><span class="goal-key">🔥 체지방률</span><span class="goal-val">${m.fat}%</span></div><div class="goal-row"><span class="goal-key">💪 골격근량</span><span class="goal-val">${m.muscle} kg</span></div><div class="goal-row"><span class="goal-key">📅 목표 기간</span><span class="goal-val">${m.goalDate}</span></div><div class="goal-row"><span class="goal-key">🥗 식단</span><span class="goal-val">${m.diet}</span></div></div>`;
+  document.getElementById('mem-det-bg').classList.add('open');
+}
+function closeMemDet(){document.getElementById('mem-det-bg').classList.remove('open');}
+function renderWater(){
+  const bottles=Math.round(waterGoal/500),filled=Math.floor(waterMl/500),pct=Math.min(100,Math.round(waterMl/waterGoal*100)),remain=Math.max(0,waterGoal-waterMl);
+  document.getElementById('my-water-amt').textContent=waterMl.toLocaleString()+'ml';
+  document.getElementById('my-water-big').textContent=waterMl.toLocaleString();
+  document.getElementById('my-water-goal-lbl').textContent='/ '+waterGoal.toLocaleString()+'ml';
+  document.getElementById('my-w-bar').style.width=pct+'%';
+  document.getElementById('my-w-pct').textContent=pct+'% 달성';
+  document.getElementById('my-water-sub').innerHTML=waterMl>=waterGoal?'<b style="color:#2DA882;">🎉 오늘 목표 달성!</b>':'목표까지 <b style="color:#3A8FD4;">'+remain.toLocaleString()+'ml</b> 남았어!';
+  const row=document.getElementById('my-bottle-row');row.innerHTML='';
+  for(let i=0;i<bottles;i++){
+    const f=i<filled;const wrap=document.createElement('div');wrap.className='bottle-wrap';
+    const neck=document.createElement('div');neck.className='bottle-neck';if(f)neck.style.borderColor='#3A8FD4';
+    const bot=document.createElement('div');bot.className='bottle'+(f?' filled':'');
+    const fill=document.createElement('div');fill.className='bottle-fill';fill.style.height=f?'100%':'0%';bot.appendChild(fill);
+    const lbl=document.createElement('div');lbl.className='bottle-ml';lbl.textContent=((i+1)*500)+'ml';if(f){lbl.style.color='#3A8FD4';lbl.style.fontWeight='600';}
+    wrap.appendChild(neck);wrap.appendChild(bot);wrap.appendChild(lbl);
+    wrap.onclick=()=>{waterMl=(i+1)*500;if(waterMl>waterGoal)waterMl=waterGoal;renderWater();};
+    row.appendChild(wrap);
+  }
+}
+function addWater(v){waterMl=Math.max(0,Math.min(waterGoal+500,waterMl+v));renderWater();}
+function openWaterGoal(){
+  const opts=document.getElementById('water-opts');opts.innerHTML='';
+  [1500,2000,2500,3000].forEach(v=>{
+    const labels={1500:'가볍게',2000:'권장량',2500:'운동할 때',3000:'고강도'};
+    const div=document.createElement('div');
+    div.style.cssText=`display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;border:1.5px solid ${v===waterGoal?'#3A8FD4':'#e5e5e5'};background:${v===waterGoal?'#E8F4FD':'white'};cursor:pointer;`;
+    div.innerHTML=`<span style="font-size:13px;color:${v===waterGoal?'#3A8FD4':'#1a1a1a'};font-weight:${v===waterGoal?'600':'400'};">💧 ${v.toLocaleString()}ml</span><span style="font-size:11px;color:#aaa;">${v===waterGoal?'✓ 현재 목표':labels[v]}</span>`;
+    div.onclick=()=>{waterGoal=v;if(waterMl>v)waterMl=v;renderWater();openWaterGoal();};
+    opts.appendChild(div);
+  });
+  document.getElementById('water-modal').classList.add('open');
+}
+function closeWater(){document.getElementById('water-modal').classList.remove('open');}
+function switchGraph(t,el){curGraph=t;document.querySelectorAll('.gtab').forEach(x=>x.classList.remove('on'));el.classList.add('on');drawGraph();}
+function drawGraph(){
+  const canvas=document.getElementById('g-canvas');const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;ctx.clearRect(0,0,W,H);
+  const data=inbodyData.map(d=>d[curGraph]);const goal=GG[curGraph];const color=GC[curGraph];
+  const allV=[...data,goal];const minV=Math.min(...allV)-2;const maxV=Math.max(...allV)+2;
+  const pad={l:32,r:12,t:12,b:8};const gW=W-pad.l-pad.r;const gH=H-pad.t-pad.b;
+  const toX=i=>pad.l+(i/(data.length-1))*gW;const toY=v=>pad.t+gH-((v-minV)/(maxV-minV))*gH;
+  ctx.strokeStyle='#f0f0f0';ctx.lineWidth=1;
+  for(let i=0;i<4;i++){const y=pad.t+(i/3)*gH;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();ctx.fillStyle='#ccc';ctx.font='9px sans-serif';ctx.textAlign='right';ctx.fillText((maxV-(i/3)*(maxV-minV)).toFixed(1),pad.l-3,y+3);}
+  const goalY=toY(goal);ctx.strokeStyle='rgba(46,110,32,.5)';ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(pad.l,goalY);ctx.lineTo(W-pad.r,goalY);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#2E6E20';ctx.font='9px sans-serif';ctx.textAlign='left';ctx.fillText('목표'+goal,pad.l+2,goalY-3);
+  const grad=ctx.createLinearGradient(0,pad.t,0,H);grad.addColorStop(0,color+'33');grad.addColorStop(1,color+'05');
+  ctx.beginPath();ctx.moveTo(toX(0),toY(data[0]));data.forEach((v,i)=>ctx.lineTo(toX(i),toY(v)));ctx.lineTo(toX(data.length-1),H-pad.b);ctx.lineTo(toX(0),H-pad.b);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.lineJoin='round';data.forEach((v,i)=>i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)));ctx.stroke();
+  data.forEach((v,i)=>{ctx.fillStyle=color;ctx.beginPath();ctx.arc(toX(i),toY(v),4,0,Math.PI*2);ctx.fill();ctx.fillStyle='white';ctx.beginPath();ctx.arc(toX(i),toY(v),2,0,Math.PI*2);ctx.fill();ctx.fillStyle=color;ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(v,toX(i),toY(v)-8);});
+  document.getElementById('g-xlbl').innerHTML=inbodyData.map(d=>'<span>'+d.date+'</span>').join('');
+  document.getElementById('g-legend').innerHTML=`<div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;"><div style="width:8px;height:8px;border-radius:50%;background:${color};"></div>${GL[curGraph]}</div><div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#666;"><div style="width:8px;height:8px;border-radius:50%;background:#2E6E20;"></div>목표</div>`;
+}
+function openInbody(){document.getElementById('inbody-date').value=new Date().toISOString().split('T')[0];document.getElementById('inbody-modal').classList.add('open');}
+function closeInbody(){document.getElementById('inbody-modal').classList.remove('open');}
+function saveInbody(){
+  const w=parseFloat(document.getElementById('inp-w').value);const f=parseFloat(document.getElementById('inp-f').value);const mm=parseFloat(document.getElementById('inp-m').value);
+  const d=document.getElementById('inbody-date').value;if(!w&&!f&&!mm){alert('측정값을 입력해줘!');return;}
+  const mo2=d?(parseInt(d.split('-')[1])+'월'):'신규';
+  const ex=inbodyData.findIndex(x=>x.date===mo2);
+  const entry={date:mo2,weight:w||inbodyData.at(-1).weight,fat:f||inbodyData.at(-1).fat,muscle:mm||inbodyData.at(-1).muscle};
+  if(ex>=0)inbodyData[ex]=entry;else inbodyData.push(entry);
+  drawGraph();closeInbody();alert('인바디 저장 완료! 📊');
+}
+function openAdd(t){selType(t);document.getElementById('add-modal').classList.add('open');}
+function closeAdd(){document.getElementById('add-modal').classList.remove('open');}
+function selType(t){document.getElementById('tc-w').classList.toggle('sel',t==='workout');document.getElementById('tc-b').classList.toggle('sel',t==='body');document.getElementById('f-workout').style.display=t==='workout'?'block':'none';document.getElementById('f-body').style.display=t==='body'?'block':'none';document.getElementById('add-ttl').textContent=t==='workout'?'운동 기록하기':'눈바디 기록하기';}
+function selCat(id){if(curCat)document.getElementById('cat-'+curCat).classList.remove('sel');curCat=id;document.getElementById('cat-'+id).classList.add('sel');document.getElementById('other-wrap').style.display=id==='etc'?'block':'none';}
+function upCnt(el,cid,max){if(el.value.length>max)el.value=el.value.slice(0,max);document.getElementById(cid).textContent=el.value.length+'/'+max;}
+function prevImg(inp,pid,zid){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{const img=document.getElementById(pid);img.src=e.target.result;img.style.display='block';document.getElementById(zid).style.display='none';};r.readAsDataURL(f);}
+function togW(){wPub=!wPub;const t=document.getElementById('wt');t.classList.toggle('on',wPub);t.classList.toggle('off',!wPub);document.getElementById('w-ptxt').textContent=wPub?'공개':'비공개';document.getElementById('w-psub').textContent=wPub?'멤버 모두에게 공개':'나만 볼 수 있어요';document.getElementById('w-icon').textContent=wPub?'🌍':'🔒';}
+function togB(){bPub=!bPub;const t=document.getElementById('bt');t.classList.toggle('on',bPub);t.classList.toggle('off',!bPub);document.getElementById('b-ptxt').textContent=bPub?'공개':'비공개';document.getElementById('b-psub').textContent=bPub?'멤버 모두에게 공개돼요':'나만 볼 수 있어요';document.getElementById('b-icon').textContent=bPub?'🌍':'🔒';}
+function save(){closeAdd();alert('올리기 완료! 🎉');}
+function openDet(w,m,ds){document.getElementById('det-photo').textContent=w.emoji;document.getElementById('det-photo').style.background=m.bg;document.getElementById('det-ava').textContent=m.ini;document.getElementById('det-ava').style.cssText=`width:34px;height:34px;font-size:13px;background:${m.bg};color:${m.tc};border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;`;document.getElementById('det-ttl').textContent=w.name;document.getElementById('det-date').textContent=m.name+' · '+ds;document.getElementById('det-desc').textContent=w.desc;document.getElementById('det-bg').classList.add('open');}
+function closeDet(){document.getElementById('det-bg').classList.remove('open');}
+function openBodyDet(){document.getElementById('body-photo-wrap').innerHTML='<div style="position:relative;"><div class="det-photo" style="background:#EDD9F7;filter:blur(16px);">🏃‍♀️</div><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:20px 20px 0 0;"><span style="font-size:30px;">🔒</span><span style="font-size:13px;color:white;font-weight:600;">비공개 사진</span></div></div>';document.getElementById('body-unlock-area').innerHTML='<button style="width:100%;padding:11px;border-radius:12px;background:#9B6EB5;color:white;border:none;font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;" onclick="unlockBody()">🔓 내 사진 보기</button>';document.getElementById('body-bg').classList.add('open');}
+function unlockBody(){document.getElementById('body-photo-wrap').innerHTML='<div class="det-photo" style="background:#EDD9F7;filter:none;">🏃‍♀️</div>';document.getElementById('body-unlock-area').innerHTML='';}
+function closeBodyDet(){document.getElementById('body-bg').classList.remove('open');}
+function renderRules(){
+  const list=document.getElementById('cmd-list');list.innerHTML='';
+  RULES.forEach((r,i)=>{const div=document.createElement('div');div.className='cmd-item'+(r.hl?' hl':'');div.innerHTML=`<div class="cmd-num${r.hl?' hl':''}">${i+1}</div><div style="flex:1;"><div class="cmd-rule">${r.r}</div><div class="cmd-desc">${r.d}</div></div><span style="font-size:18px;">${r.e}</span>`;list.appendChild(div);});
+}
+renderFeed('all');
+renderRules();
+</script>
+</body>
+</html>
